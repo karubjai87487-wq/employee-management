@@ -1,0 +1,242 @@
+<div class="flex min-h-screen bg-[#F8FAFC]">
+
+  <!-- Sidebar -->
+  <aside
+    class="w-80 bg-white border-r border-gray-100 flex flex-col fixed inset-y-0 z-50 shadow-2xl shadow-gray-200/50">
+
+    <!-- Profile Section -->
+    <div class="p-8 border-b border-gray-100">
+      <div class="flex flex-col items-center text-center">
+        <div
+          class="w-24 h-24 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-[35px] flex items-center justify-center text-white text-4xl font-black shadow-2xl shadow-blue-500/30 mb-5 border-4 border-white">
+          {{ user?.full_name?.charAt(0) }}
+        </div>
+        <h2 class="text-xl font-black text-gray-900 tracking-tight mb-1">{{ user?.full_name }}</h2>
+        <p class="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] mb-3">{{ user?.role }} • {{
+          user?.department }}</p>
+        <div class="px-4 py-1.5 bg-gray-50 rounded-full text-[10px] font-bold text-gray-400 truncate w-full">
+          {{ user?.email }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex-1 p-6 space-y-2 overflow-y-auto">
+      <p class="px-4 text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Workspace</p>
+
+      <button (click)="setView('dashboard')"
+        [class]="activeView === 'dashboard' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'text-gray-500 hover:bg-gray-50'"
+        class="w-full flex items-center gap-4 px-4 py-4 rounded-2xl transition-all group">
+        <span class="text-xl group-hover:scale-110 transition-transform">📊</span>
+        <span class="text-xs font-black uppercase tracking-widest">Dashboard</span>
+      </button>
+
+      <button (click)="setView('requests')"
+        [class]="activeView === 'requests' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'text-gray-500 hover:bg-gray-50'"
+        class="w-full flex items-center gap-4 px-4 py-4 rounded-2xl transition-all group">
+        <span class="text-xl group-hover:scale-110 transition-transform">📋</span>
+        <span class="text-xs font-black uppercase tracking-widest">My Requests</span>
+      </button>
+
+      <button (click)="setView('calendar')"
+        [class]="activeView === 'calendar' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'text-gray-500 hover:bg-gray-50'"
+        class="w-full flex items-center gap-4 px-4 py-4 rounded-2xl transition-all group">
+        <span class="text-xl group-hover:scale-110 transition-transform">📅</span>
+        <span class="text-xs font-black uppercase tracking-widest">Team Calendar</span>
+      </button>
+
+      <button (click)="setView('settings')"
+        [class]="activeView === 'settings' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'text-gray-500 hover:bg-gray-50'"
+        class="w-full flex items-center gap-4 px-4 py-4 rounded-2xl transition-all group">
+        <span class="text-xl group-hover:scale-110 transition-transform">⚙️</span>
+        <span class="text-xs font-black uppercase tracking-widest">Settings</span>
+      </button>
+
+      @if (isManager) {
+      <div class="pt-6 pb-2">
+        <p class="px-4 text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Management</p>
+        <button (click)="setView('approvals')"
+          [class]="activeView === 'approvals' ? 'bg-amber-600 text-white shadow-lg shadow-amber-500/20' : 'text-gray-500 hover:bg-gray-50'"
+          class="w-full flex items-center gap-4 px-4 py-4 rounded-2xl transition-all group">
+          <span class="text-xl group-hover:scale-110 transition-transform">✅</span>
+          <span class="text-xs font-black uppercase tracking-widest">Approvals</span>
+        </button>
+      </div>
+      }
+    </nav>
+
+    <!-- Footer Actions -->
+    <div class="p-6 border-t border-gray-100 space-y-3">
+      <button (click)="openEdit()"
+        class="w-full flex items-center justify-between px-6 py-4 bg-gray-50 rounded-2xl text-gray-500 hover:bg-indigo-50 transition-all border border-transparent hover:border-indigo-100 group">
+        <span class="text-[10px] font-black uppercase tracking-widest group-hover:text-indigo-600">Edit Profile</span>
+        <span class="text-lg">✏️</span>
+      </button>
+      <button (click)="logout()"
+        class="w-full py-4 bg-gray-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-[1.02] transition-all active:scale-95 shadow-xl shadow-gray-500/10 mb-2">
+        Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="ml-80 flex-1 p-8 lg:p-12 min-h-screen">
+    <div class="max-w-6xl mx-auto">
+
+      @if (activeView === 'dashboard') {
+      <!-- Content Header -->
+      <div class="flex items-center justify-between mb-10">
+        <div>
+          <h1 class="text-4xl font-black text-gray-900 tracking-tight leading-tight">
+            Welcome back, <span class="text-indigo-600">{{ user?.full_name?.split(' ')[0] || 'Employee' }}</span>!
+          </h1>
+          <p class="text-gray-400 font-bold uppercase text-[10px] tracking-[0.3em] mt-2">
+            {{ user?.department }} • Current Overview
+          </p>
+        </div>
+
+        <button (click)="applyLeave()"
+          class="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-2xl shadow-indigo-500/30 active:scale-95">
+          + New Request
+        </button>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
+        <!-- Remaining -->
+        <div
+          class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 group hover:scale-[1.02] transition-all">
+          <div
+            class="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-2xl mb-4 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+            📅</div>
+          <p class="text-4xl font-black text-gray-900 tracking-tight mb-1">{{ remainingLeaves }}</p>
+          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Days Available</p>
+        </div>
+        <!-- Pending -->
+        <div
+          class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 group hover:scale-[1.02] transition-all">
+          <div
+            class="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-2xl mb-4 group-hover:bg-amber-600 group-hover:text-white transition-colors">
+            ⏳</div>
+          <p class="text-4xl font-black text-gray-900 tracking-tight mb-1">{{ pendingRequests }}</p>
+          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Pending Requests</p>
+        </div>
+        <!-- Approved -->
+        <div
+          class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 group hover:scale-[1.02] transition-all">
+          <div
+            class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-2xl mb-4 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+            ✓</div>
+          <p class="text-4xl font-black text-gray-900 tracking-tight mb-1">{{ approvedLeaves }}</p>
+          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Approved This Year</p>
+        </div>
+        <!-- Used -->
+        <div
+          class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 group hover:scale-[1.02] transition-all">
+          <div
+            class="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-2xl mb-4 group-hover:bg-rose-600 group-hover:text-white transition-colors">
+            📌</div>
+          <p class="text-4xl font-black text-gray-900 tracking-tight mb-1">{{ usedDays }}</p>
+          <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Days Taken</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2 space-y-8">
+          <!-- Recent Requests -->
+          <div class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100">
+            <div class="flex items-center justify-between mb-8">
+              <h3 class="text-xl font-black text-gray-900 tracking-tight">Recent Activity</h3>
+              <button (click)="setView('requests')"
+                class="text-[10px] font-black uppercase tracking-widest text-indigo-500 hover:text-indigo-600 transition-colors">View
+                All Activity →</button>
+            </div>
+            <app-leave-requests-list></app-leave-requests-list>
+          </div>
+        </div>
+
+        <div class="space-y-8">
+          <!-- Balance Visualization -->
+          <div class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100">
+            <h3 class="text-lg font-black text-gray-900 tracking-tight mb-6">Leave Breakdown</h3>
+            <app-leave-balance></app-leave-balance>
+          </div>
+
+          <!-- Quick Tip -->
+          <div
+            class="bg-indigo-600 p-8 rounded-[40px] text-white relative overflow-hidden shadow-2xl shadow-indigo-500/20">
+            <div class="relative z-10">
+              <p class="text-[10px] font-black uppercase tracking-widest opacity-60 mb-2">New Update</p>
+              <h4 class="text-xl font-black mb-4 leading-tight">Remote Work requests now available!</h4>
+              <p class="text-sm opacity-80 mb-6 leading-relaxed">Request remote days without impacting your vacation
+                balance.</p>
+              <button (click)="applyLeave()"
+                class="w-full py-3 bg-white text-indigo-600 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-50 transition-all active:scale-95">Check
+                it out</button>
+            </div>
+            <div class="absolute -right-8 -bottom-8 text-9xl opacity-10 pointer-events-none">🌐</div>
+          </div>
+        </div>
+      </div>
+      } @else if (activeView === 'requests') {
+      <div class="flex items-center justify-between mb-10">
+        <div>
+          <h1 class="text-4xl font-black text-gray-900 tracking-tight leading-tight">My Request History</h1>
+          <p class="text-gray-400 font-bold uppercase text-[10px] tracking-[0.3em] mt-2">Track your applications and
+            status</p>
+        </div>
+        <button (click)="setView('dashboard')"
+          class="text-[10px] font-black uppercase tracking-widest text-indigo-500 hover:text-indigo-600 transition-colors">←
+          Back to Dashboard</button>
+      </div>
+      <div class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100">
+        <app-my-requests></app-my-requests>
+      </div>
+      } @else if (activeView === 'calendar') {
+      <div class="mb-10">
+        <h1 class="text-4xl font-black text-gray-900 tracking-tight leading-tight">Team Absence Map</h1>
+        <p class="text-gray-400 font-bold uppercase text-[10px] tracking-[0.3em] mt-2">See who else is out across the
+          team</p>
+      </div>
+      <div class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100">
+        <app-calendar></app-calendar>
+      </div>
+      } @else if (activeView === 'settings') {
+      <div class="mb-10">
+        <h1 class="text-4xl font-black text-gray-900 tracking-tight leading-tight">Account Settings</h1>
+        <p class="text-gray-400 font-bold uppercase text-[10px] tracking-[0.3em] mt-2">Configure your preferences</p>
+      </div>
+      <div class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100">
+        <app-settings></app-settings>
+      </div>
+      } @else if (activeView === 'approvals') {
+      <div class="mb-10">
+        <h1 class="text-4xl font-black text-gray-900 tracking-tight leading-tight">Manager Approvals</h1>
+        <p class="text-gray-400 font-bold uppercase text-[10px] tracking-[0.3em] mt-2">Review pending team requests</p>
+      </div>
+      <div class="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100">
+        <app-leave-approval></app-leave-approval>
+      </div>
+      }
+
+    </div>
+
+    <!-- Modals -->
+    @if (showLeaveForm) {
+    <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+      <div class="w-full max-w-xl animate-scale-in">
+        <app-leave-request-form (close)="onLeaveFormClose()"
+          (submitted)="onLeaveFormSubmitted()"></app-leave-request-form>
+      </div>
+    </div>
+    }
+
+    @if (showEdit) {
+    <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+      <div class="w-full max-w-4xl animate-scale-in">
+        <app-profile-edit [user]="user" (close)="onEditClose()"></app-profile-edit>
+      </div>
+    </div>
+    }
+  </main>
+</div>
